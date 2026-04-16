@@ -365,21 +365,34 @@ export default function RankPage() {
                   key={r.id}
                   onClick={() => addToRanking(r.id)}
                   disabled={ranked.length >= 5}
-                  className="w-full rounded-lg border border-amber-200 bg-white p-3 text-left transition-all hover:border-amber-400 hover:shadow-sm disabled:cursor-not-allowed disabled:opacity-50"
+                  className="flex w-full items-start gap-3 rounded-lg border border-amber-200 bg-white p-3 text-left transition-all hover:border-amber-400 hover:shadow-sm disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  <p className="font-medium text-amber-900">{r.name}</p>
-                  {r.biscuits.length > 0 && (
-                    <div className="mt-1 flex flex-wrap gap-1">
-                      {r.biscuits.map((b) => (
-                        <span
-                          key={b.biscuitType.id}
-                          className="rounded-full bg-amber-50 px-2 py-0.5 text-xs text-amber-600"
-                        >
-                          {b.biscuitType.name}
-                        </span>
-                      ))}
-                    </div>
+                  {r.imageUrl && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={r.imageUrl}
+                      alt={r.name}
+                      className="h-10 w-10 flex-shrink-0 rounded border border-amber-200 object-contain bg-white"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = "none";
+                      }}
+                    />
                   )}
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-amber-900">{r.name}</p>
+                    {r.biscuits.length > 0 && (
+                      <div className="mt-1 flex flex-wrap gap-1">
+                        {r.biscuits.map((b) => (
+                          <span
+                            key={b.biscuitType.id}
+                            className="rounded-full bg-amber-50 px-2 py-0.5 text-xs text-amber-600"
+                          >
+                            {b.biscuitType.name}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </button>
               ))}
               {filteredAvailable.length === 0 && (

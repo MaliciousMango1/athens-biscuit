@@ -42,6 +42,14 @@ export default async function BiscuitTypePage({
             <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-amber-100 text-lg font-bold text-amber-800">
               {index + 1}
             </div>
+            {entry.imageUrl && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={entry.imageUrl}
+                alt={entry.restaurantName}
+                className="h-12 w-12 flex-shrink-0 rounded-lg border border-amber-200 object-contain bg-white"
+              />
+            )}
             <div className="flex-1 min-w-0">
               <h3 className="font-semibold text-amber-900 truncate">{entry.restaurantName}</h3>
               {entry.address && (

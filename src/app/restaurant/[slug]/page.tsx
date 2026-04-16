@@ -28,22 +28,32 @@ export default async function RestaurantPage({
       </Link>
 
       <div className="rounded-lg border border-amber-200 bg-white p-6">
-        <div className="flex items-start justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-amber-900">{restaurant.name}</h1>
-            {restaurant.address && (
-              <p className="mt-1 text-amber-600">{restaurant.address}</p>
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex items-start gap-4 flex-1 min-w-0">
+            {restaurant.imageUrl && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={restaurant.imageUrl}
+                alt={restaurant.name}
+                className="h-20 w-20 flex-shrink-0 rounded-lg border border-amber-200 object-contain bg-white"
+              />
             )}
-            {restaurant.website && (
-              <a
-                href={restaurant.website}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-1 inline-block text-sm text-amber-500 hover:text-amber-700"
-              >
-                Visit Website &rarr;
-              </a>
-            )}
+            <div className="min-w-0">
+              <h1 className="text-2xl font-bold text-amber-900">{restaurant.name}</h1>
+              {restaurant.address && (
+                <p className="mt-1 text-amber-600">{restaurant.address}</p>
+              )}
+              {restaurant.website && (
+                <a
+                  href={restaurant.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-1 inline-block text-sm text-amber-500 hover:text-amber-700"
+                >
+                  Visit Website &rarr;
+                </a>
+              )}
+            </div>
           </div>
           {position > 0 && (
             <div className="text-right">

@@ -54,6 +54,19 @@ export function LeaderboardClient() {
               {index + 1}
             </div>
 
+            {/* Image */}
+            {entry.imageUrl && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={entry.imageUrl}
+                alt={entry.restaurantName}
+                className="h-12 w-12 flex-shrink-0 rounded-lg border border-amber-200 object-contain bg-white"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).style.display = "none";
+                }}
+              />
+            )}
+
             {/* Info */}
             <div className="flex-1 min-w-0">
               <h3 className="font-semibold text-amber-900 truncate">{entry.restaurantName}</h3>

@@ -6,6 +6,7 @@ export interface LeaderboardEntry {
   restaurantName: string;
   restaurantSlug: string;
   address: string | null;
+  imageUrl: string | null;
   voteCount: number;
   rawAverage: number;
   bayesianScore: number;
@@ -41,7 +42,7 @@ export async function getLeaderboard(
   const restaurantMap = new Map<
     string,
     {
-      restaurant: { id: string; name: string; slug: string; address: string | null };
+      restaurant: { id: string; name: string; slug: string; address: string | null; imageUrl: string | null };
       points: number[];
       biscuitTypeCounts: Map<string, number>;
     }
@@ -67,6 +68,7 @@ export async function getLeaderboard(
           name: entry.restaurant.name,
           slug: entry.restaurant.slug,
           address: entry.restaurant.address,
+          imageUrl: entry.restaurant.imageUrl,
         },
         points: [points],
         biscuitTypeCounts,
@@ -105,6 +107,7 @@ export async function getLeaderboard(
         restaurantName: restaurant.name,
         restaurantSlug: restaurant.slug,
         address: restaurant.address,
+        imageUrl: restaurant.imageUrl,
         voteCount: v,
         rawAverage: Math.round(R * 100) / 100,
         bayesianScore: Math.round(bayesianScore * 100) / 100,
