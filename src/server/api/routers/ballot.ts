@@ -101,31 +101,17 @@ export const ballotRouter = createTRPCRouter({
         });
       }
 
-      // Upsert ballot: delete existing entries and recreate
-      const ballot = await ctx.db.ballot.upsert({
-        where: { visitorId },
-        create: {
-          visitorId,
-          ipHash,
-          entries: {
-            create: input.entries.map((e) => ({
-              restaurantId: e.restaurantId,
-              position: e.position,
-              biscuitTypeId: e.biscuitTypeId ?? null,
-            })),
-          },
-        },
-        update: {
-          ipHash,
-          entries: {
-            deleteMany: {},
-          },
-        },
-      });
+      // Upsert ballot and replace its entries atomically
+      await ctx.db.$transaction(async (tx) => {
+        const ballot = await tx.ballot.upsert({
+          where: { visitorId },
+          create: { visitorId, ipHash },
+          update: { ipHash },
+        });
 
-      // If updating, create the new entries
-      if (ballot) {
-        await ctx.db.ballotEntry.createMany({
+        // Delete any prior entries (no-op on fresh create) then add the new set
+        await tx.ballotEntry.deleteMany({ where: { ballotId: ballot.id } });
+        await tx.ballotEntry.createMany({
           data: input.entries.map((e) => ({
             ballotId: ballot.id,
             restaurantId: e.restaurantId,
@@ -133,7 +119,7 @@ export const ballotRouter = createTRPCRouter({
             biscuitTypeId: e.biscuitTypeId ?? null,
           })),
         });
-      }
+      });
 
       return { success: true };
     }),
