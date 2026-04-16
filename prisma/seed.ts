@@ -60,6 +60,13 @@ async function main() {
       biscuitSlugs: ["chicken", "bacon-egg-cheese", "sausage"],
     },
     {
+      name: "McDonald's",
+      slug: "mcdonalds",
+      website: "https://www.mcdonalds.com/",
+      notes: "Chain. Sausage biscuit, bacon egg & cheese biscuit, and sausage egg & cheese biscuit.",
+      biscuitSlugs: ["sausage", "bacon-egg-cheese"],
+    },
+    {
       name: "The Farm Cart",
       slug: "the-farm-cart",
       address: "1074 Baxter St, Athens, GA 30606",
