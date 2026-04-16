@@ -9,10 +9,13 @@ export const POSITION_POINTS: Record<number, number> = {
 
 export const MAX_RANKINGS = 5;
 
-// Bayesian average confidence threshold
-// A restaurant needs this many votes before its score
-// reflects its actual ratings vs the global average
-export const BAYESIAN_CONFIDENCE = 5;
+// Bayesian average confidence threshold.
+// A restaurant needs this many votes before its score leans more
+// toward its own ratings than toward the global average.
+// Set low (2) during early bootstrapping — bump back to 5 once
+// we're averaging several dozen ballots and the leaderboard
+// doesn't need training wheels.
+export const BAYESIAN_CONFIDENCE = 2;
 
 // Rate limiting
 export const MAX_SUBMISSIONS_PER_HOUR = 10;

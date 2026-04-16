@@ -66,7 +66,9 @@ export default function AboutPage() {
             <strong>C</strong> = the global average score across all places
           </li>
           <li>
-            <strong>m</strong> = a confidence threshold (currently 5)
+            <strong>m</strong> = a confidence threshold (set low while the
+            site is new and votes are sparse, increased later as voting
+            volume grows)
           </li>
         </ul>
         <p className="mt-2 text-amber-800">
