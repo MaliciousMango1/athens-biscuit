@@ -23,6 +23,7 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { api } from "~/trpc/react";
+import { ShareButton } from "~/components/ShareButton";
 
 interface RankedRestaurant {
   id: string;
@@ -384,7 +385,7 @@ export default function RankPage() {
           <p className="mt-2 text-amber-600">
             Thanks for voting! You can come back anytime to update your picks.
           </p>
-          <div className="mt-4 flex justify-center gap-3">
+          <div className="mt-4 flex flex-wrap justify-center gap-3">
             <button
               onClick={() => setSubmitted(false)}
               className="rounded-full border border-amber-300 px-4 py-2 text-sm font-semibold text-amber-700 hover:bg-amber-50"
@@ -397,6 +398,16 @@ export default function RankPage() {
             >
               View Leaderboard
             </a>
+            <ShareButton
+              label="Tell a friend"
+              title="Athens Biscuit"
+              text="I just ranked my top 5 Athens biscuit spots — come rank yours!"
+              url={
+                typeof window !== "undefined"
+                  ? `${window.location.origin}/`
+                  : "/"
+              }
+            />
           </div>
         </div>
       </div>
