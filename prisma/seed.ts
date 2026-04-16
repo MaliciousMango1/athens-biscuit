@@ -9,7 +9,7 @@ async function main() {
   const biscuitTypes = await Promise.all(
     [
       { name: "Sausage", slug: "sausage" },
-      { name: "Cathead", slug: "cathead" },
+      { name: "Honey Butter", slug: "honey-butter" },
       { name: "Chicken", slug: "chicken" },
       { name: "Bacon Egg Cheese", slug: "bacon-egg-cheese" },
       { name: "Country Ham", slug: "country-ham" },
@@ -27,92 +27,33 @@ async function main() {
 
   console.log(`Created ${biscuitTypes.length} biscuit types`);
 
-  // Create some Athens restaurants
+  // Athens biscuit restaurants
   const restaurants = [
-    {
-      name: "Mama's Boy",
-      slug: "mamas-boy",
-      address: "197 Oak St, Athens, GA 30601",
-      notes: "A beloved Athens institution known for Southern comfort food.",
-      biscuitSlugs: ["sausage", "cathead", "gravy", "country-ham"],
-    },
-    {
-      name: "Big City Bread Cafe",
-      slug: "big-city-bread-cafe",
-      address: "393 N Finley St, Athens, GA 30601",
-      notes: "Artisan bakery and cafe with outstanding biscuits.",
-      biscuitSlugs: ["cathead", "sausage", "bacon-egg-cheese", "sweet-jam"],
-    },
-    {
-      name: "Ike & Jane",
-      slug: "ike-and-jane",
-      address: "1235 S Milledge Ave #100, Athens, GA 30605",
-      notes: "Creative cafe with eclectic biscuit options.",
-      biscuitSlugs: ["sausage", "chicken", "bacon-egg-cheese", "veggie-vegan"],
-    },
-    {
-      name: "Weaver D's",
-      slug: "weaver-ds",
-      address: "1016 E Broad St, Athens, GA 30601",
-      notes: "Automatic for the People! Classic soul food.",
-      biscuitSlugs: ["cathead", "gravy", "sausage"],
-    },
-    {
-      name: "Mayflower",
-      slug: "mayflower",
-      address: "1696 S Lumpkin St, Athens, GA 30606",
-      notes: "No-frills Southern diner with amazing breakfast.",
-      biscuitSlugs: ["sausage", "gravy", "country-ham", "bacon-egg-cheese"],
-    },
-    {
-      name: "Sr. Sol",
-      slug: "sr-sol",
-      address: "1090 Baxter St, Athens, GA 30606",
-      notes: "Mexican-meets-Southern breakfast spot.",
-      biscuitSlugs: ["sausage", "chicken", "bacon-egg-cheese"],
-    },
-    {
-      name: "Clocked!",
-      slug: "clocked",
-      address: "259 W Washington St, Athens, GA 30601",
-      notes: "Late-night spot with creative takes on Southern classics.",
-      biscuitSlugs: ["chicken", "sausage", "bacon-egg-cheese"],
-    },
-    {
-      name: "Nedza's Waffles & Biscuits",
-      slug: "nedzas-waffles-biscuits",
-      address: "155 Pulaski St, Athens, GA 30601",
-      biscuitSlugs: ["cathead", "chicken", "sausage", "gravy", "sweet-jam"],
-    },
+    { name: "Mama's Boy", slug: "mamas-boy" },
+    { name: "Golden Pantry", slug: "golden-pantry" },
+    { name: "Chick-fil-A", slug: "chick-fil-a" },
+    { name: "The Farm Cart", slug: "the-farm-cart" },
+    { name: "Biscuit Basket", slug: "biscuit-basket" },
+    { name: "The Flying Biscuit Cafe", slug: "the-flying-biscuit-cafe" },
+    { name: "Big City Bread", slug: "big-city-bread" },
+    { name: "Cafe Racer", slug: "cafe-racer" },
+    { name: "Sully's Steams", slug: "sullys-steams" },
+    { name: "The Place", slug: "the-place" },
+    { name: "Team Biscuits & Burgers", slug: "team-biscuits-and-burgers" },
+    { name: "Strickland's", slug: "stricklands" },
+    { name: "Suncatcher Cafe", slug: "suncatcher-cafe" },
+    { name: "Another Broken Egg Cafe", slug: "another-broken-egg-cafe" },
+    { name: "First Watch", slug: "first-watch" },
+    { name: "QuikTrip", slug: "quiktrip" },
+    { name: "RaceTrac", slug: "racetrac" },
   ];
 
   for (const r of restaurants) {
-    const { biscuitSlugs, ...data } = r;
-    const restaurant = await prisma.restaurant.upsert({
-      where: { slug: data.slug },
+    await prisma.restaurant.upsert({
+      where: { slug: r.slug },
       update: {},
-      create: data,
+      create: r,
     });
-
-    // Link biscuit types
-    for (const slug of biscuitSlugs) {
-      const bt = biscuitTypes.find((b) => b.slug === slug);
-      if (bt) {
-        await prisma.restaurantBiscuit.upsert({
-          where: {
-            restaurantId_biscuitTypeId: {
-              restaurantId: restaurant.id,
-              biscuitTypeId: bt.id,
-            },
-          },
-          update: {},
-          create: {
-            restaurantId: restaurant.id,
-            biscuitTypeId: bt.id,
-          },
-        });
-      }
-    }
   }
 
   console.log(`Created ${restaurants.length} restaurants`);
