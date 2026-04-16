@@ -50,3 +50,5 @@ yarn-error.log*
 
 # Generated
 generated/
+# Claude Code
+.claude/
