@@ -9,6 +9,8 @@ services:
       - pgdata:/var/lib/postgresql/data
     ports:
       - "5433:5432"
+    networks:
+      - cfmain
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U biscuits"]
       interval: 5s
@@ -29,6 +31,12 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    networks:
+      - cfmain
 
 volumes:
   pgdata:
+
+networks:
+  cfmain:
+    external: true
