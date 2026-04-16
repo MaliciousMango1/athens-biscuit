@@ -28,7 +28,7 @@ export default function RootLayout({
             <div className="mx-auto flex max-w-4xl items-center justify-between px-4 py-3">
               <Link href="/" className="flex items-center gap-2 text-lg font-bold text-amber-900">
                 <span className="text-2xl">🫓</span>
-                <span>Athens Biscuit Rankings</span>
+                <span>Athens Biscuit</span>
               </Link>
               <div className="flex items-center gap-4">
                 <Link
