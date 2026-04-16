@@ -32,6 +32,19 @@ export default async function HomePage() {
             </Link>
           </p>
         </div>
+
+        {/* Leaderboard section header */}
+        <div className="mb-4 flex items-end justify-between border-b-2 border-amber-300 pb-2">
+          <div>
+            <h2 className="text-2xl font-bold text-amber-900">
+              🏆 Current Leaderboard
+            </h2>
+            <p className="text-sm text-amber-600">
+              How the community has ranked Athens biscuit spots so far.
+            </p>
+          </div>
+        </div>
+
         <LeaderboardClient />
       </div>
     </HydrateClient>
