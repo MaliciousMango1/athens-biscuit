@@ -1,0 +1,84 @@
+generator client {
+    provider = "prisma-client-js"
+    output   = "../generated/prisma"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model Restaurant {
+    id        String   @id @default(cuid())
+    name      String
+    slug      String   @unique
+    address   String?
+    website   String?
+    imageUrl  String?
+    notes     String?
+    active    Boolean  @default(true)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    biscuits RestaurantBiscuit[]
+    entries  BallotEntry[]
+
+    @@index([slug])
+}
+
+model BiscuitType {
+    id   String @id @default(cuid())
+    name String @unique
+    slug String @unique
+
+    restaurants RestaurantBiscuit[]
+    entries     BallotEntry[]
+
+    @@index([slug])
+}
+
+model RestaurantBiscuit {
+    restaurantId  String
+    biscuitTypeId String
+    restaurant    Restaurant  @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+    biscuitType   BiscuitType @relation(fields: [biscuitTypeId], references: [id], onDelete: Cascade)
+
+    @@id([restaurantId, biscuitTypeId])
+}
+
+model Ballot {
+    id        String   @id @default(cuid())
+    visitorId String   @unique
+    ipHash    String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    entries BallotEntry[]
+
+    @@index([ipHash])
+}
+
+model BallotEntry {
+    id            String       @id @default(cuid())
+    ballotId      String
+    restaurantId  String
+    position      Int
+    biscuitTypeId String?
+
+    ballot      Ballot       @relation(fields: [ballotId], references: [id], onDelete: Cascade)
+    restaurant  Restaurant   @relation(fields: [restaurantId], references: [id])
+    biscuitType BiscuitType? @relation(fields: [biscuitTypeId], references: [id])
+
+    @@unique([ballotId, position])
+    @@unique([ballotId, restaurantId])
+}
+
+model Suggestion {
+    id        String   @id @default(cuid())
+    kind      String // "restaurant" | "biscuit"
+    name      String
+    details   String?
+    email     String?
+    status    String   @default("pending") // pending | approved | rejected
+    createdAt DateTime @default(now())
+}
