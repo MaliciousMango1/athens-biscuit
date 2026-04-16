@@ -37,6 +37,13 @@ async function main() {
   // Athens-area biscuit restaurants
   const restaurants = [
     {
+      name: "Angie's Place",
+      slug: "angies-place",
+      address: "10336 Hull Colbert Rd, Hull, GA 30646",
+      notes: "Unassuming breakfast spot in Hull, just outside Athens. Known for huge biscuits and old-fashioned Southern cooking. No-frills, cash-friendly.",
+      biscuitSlugs: ["sausage", "bacon-egg-cheese", "country-ham", "gravy"],
+    },
+    {
       name: "Mama's Boy",
       slug: "mamas-boy",
       address: "197 Oak St, Athens, GA 30601",
