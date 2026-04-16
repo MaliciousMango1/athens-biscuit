@@ -18,7 +18,7 @@ services:
   web:
     build: .
     ports:
-      - "3000:3000"
+      - "3001:3000"
     environment:
       DATABASE_URL: postgresql://biscuits:${DB_PASSWORD:-changeme}@db:5432/biscuits
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-changeme}
