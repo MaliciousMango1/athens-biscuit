@@ -82,23 +82,11 @@ export default function AboutPage() {
           Anonymous Voting
         </h2>
         <p className="mt-2 text-amber-800">
-          You don&apos;t have to make an account to vote. To keep this from
-          being a total free-for-all, we do a few things:
+          You don&apos;t have to make an account to vote — re-visiting the
+          site lets you update your existing picks instead of stacking new
+          ones. A handful of other quiet guardrails are in place to deter
+          casual ballot stuffing.
         </p>
-        <ul className="mt-2 text-amber-800">
-          <li>
-            A long-lived cookie remembers your ballot so returning to the site
-            updates your existing picks instead of adding new ones.
-          </li>
-          <li>
-            Your IP address is hashed (never stored in the clear) as a
-            secondary identifier.
-          </li>
-          <li>
-            A rate limit caps how many new ballots can come from one network
-            per hour.
-          </li>
-        </ul>
       </section>
 
       <section className="mt-6 rounded-lg border border-amber-300 bg-amber-100 p-4">
@@ -109,21 +97,20 @@ export default function AboutPage() {
           <strong>
             This site is for fun. It is <em>not</em> scientific.
           </strong>{" "}
-          Anonymous voting is fundamentally gameable. A determined person with
-          a different browser, a VPN, or a friend&apos;s phone can cast
-          multiple ballots. The anti-spam measures above raise the friction,
-          but they don&apos;t eliminate it.
+          Any anonymous ranking can be gamed by someone determined enough.
+          The guardrails here make that harder, but they can&apos;t make it
+          impossible.
         </p>
         <p className="mt-3 text-amber-900">
           So please take the leaderboard with a grain of salt. If a biscuit
           spot suddenly rockets to #1 overnight, maybe they&apos;re having a
-          moment — or maybe someone&apos;s cousin works there. It&apos;s the
-          same caveat as any online ranking.
+          moment — or maybe someone&apos;s cousin works there. Same caveat
+          as any online ranking.
         </p>
         <p className="mt-3 text-amber-900">
-          <strong>Play nice. Vote honestly.</strong> Nobody is monetizing this
-          — it&apos;s just a fun tool to celebrate Athens biscuits. The results
-          are only interesting if they reflect real opinions.
+          <strong>Play nice. Vote honestly.</strong> Nobody is monetizing
+          this — it&apos;s just a fun tool to celebrate Athens biscuits. The
+          results are only interesting if they reflect real opinions.
         </p>
       </section>
 
