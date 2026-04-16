@@ -52,9 +52,6 @@ export default async function BiscuitTypePage({
             )}
             <div className="flex-1 min-w-0">
               <h3 className="font-semibold text-amber-900 truncate">{entry.restaurantName}</h3>
-              {entry.address && (
-                <p className="text-sm text-amber-600 truncate">{entry.address}</p>
-              )}
             </div>
             <div className="text-right flex-shrink-0">
               <p className="text-lg font-bold text-amber-900">

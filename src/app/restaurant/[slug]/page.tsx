@@ -40,9 +40,6 @@ export default async function RestaurantPage({
             )}
             <div className="min-w-0">
               <h1 className="text-2xl font-bold text-amber-900">{restaurant.name}</h1>
-              {restaurant.address && (
-                <p className="mt-1 text-amber-600">{restaurant.address}</p>
-              )}
               {restaurant.website && (
                 <a
                   href={restaurant.website}

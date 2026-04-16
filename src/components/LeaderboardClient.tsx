@@ -70,9 +70,6 @@ export function LeaderboardClient() {
             {/* Info */}
             <div className="flex-1 min-w-0">
               <h3 className="font-semibold text-amber-900 truncate">{entry.restaurantName}</h3>
-              {entry.address && (
-                <p className="text-sm text-amber-600 truncate">{entry.address}</p>
-              )}
               {entry.topBiscuitType && (
                 <span className="mt-1 inline-block rounded-full bg-amber-100 px-2 py-0.5 text-xs text-amber-700">
                   Top pick: {entry.topBiscuitType}
