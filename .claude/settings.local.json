@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx create-t3-app@latest athens-biscuit-rankings --noGit --CI --trpc --prisma --tailwind --appRouter --dbProvider postgresql)",
+      "Bash(npx create-t3-app@latest athens-biscuit-rankings --noGit --CI --trpc --prisma --tailwind --appRouter --dbProvider postgres)",
+      "Bash(npm install:*)",
+      "Bash(npx prisma:*)",
+      "Bash(npx next:*)"
+    ]
+  }
+}

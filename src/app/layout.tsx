@@ -10,7 +10,6 @@ export const metadata: Metadata = {
   title: "Athens Biscuit Rankings",
   description:
     "Rank the best biscuit restaurants in Athens, Georgia. Community-powered leaderboard.",
-  icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 
 const geist = Geist({
