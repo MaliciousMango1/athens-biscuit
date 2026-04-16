@@ -80,9 +80,13 @@ function SortableRankedItem({
           <select
             value={item.selectedBiscuitTypeId ?? ""}
             onChange={(e) => onBiscuitTypeChange(e.target.value || null)}
-            className="mt-1 w-full rounded border border-amber-200 px-2 py-1 text-sm text-amber-700 focus:border-amber-500 focus:outline-none"
+            className={`mt-1 w-full rounded border-2 px-2 py-1 text-sm focus:outline-none ${
+              item.selectedBiscuitTypeId
+                ? "border-amber-400 bg-amber-50 text-amber-800"
+                : "border-dashed border-amber-400 bg-amber-50/60 text-amber-700 focus:border-amber-500"
+            }`}
           >
-            <option value="">Pick your fav biscuit here (optional)</option>
+            <option value="">👉 Pick your favorite biscuit here</option>
             {item.biscuitTypes.map((bt) => (
               <option key={bt.id} value={bt.id}>
                 {bt.name}
@@ -282,10 +286,14 @@ export default function RankPage() {
         <h1 className="mb-2 text-2xl font-bold text-amber-900">
           Rank Your Top 5
         </h1>
-        <p className="mb-6 text-amber-600">
+        <p className="mb-2 text-amber-600">
           {myBallot.data
             ? "Update your rankings! Drag restaurants or tap to add."
             : "Drag restaurants into your ranked list, or tap to add them."}
+        </p>
+        <p className="mb-6 text-sm text-amber-500">
+          After ranking, pick your favorite biscuit type at each spot to
+          help fuel the category leaderboards.
         </p>
 
         <div className="grid gap-6 lg:grid-cols-2">
