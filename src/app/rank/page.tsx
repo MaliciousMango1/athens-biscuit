@@ -7,6 +7,8 @@ import {
   closestCenter,
   KeyboardSensor,
   PointerSensor,
+  useDraggable,
+  useDroppable,
   useSensor,
   useSensors,
   type DragStartEvent,
@@ -26,11 +28,16 @@ interface RankedRestaurant {
   id: string;
   name: string;
   slug: string;
+  imageUrl: string | null;
   selectedBiscuitTypeId: string | null;
   biscuitTypes: { id: string; name: string }[];
 }
 
-// Sortable ranked item component
+// Prefix to distinguish available-list draggable IDs from ranked IDs
+const AVAIL_PREFIX = "avail:";
+const SLOT_PREFIX = "slot:";
+
+// ---------- Ranked item (sortable) ----------
 function SortableRankedItem({
   item,
   position,
@@ -63,7 +70,6 @@ function SortableRankedItem({
       style={style}
       className="flex items-center gap-3 rounded-lg border-2 border-amber-300 bg-white p-3"
     >
-      {/* Drag handle */}
       <div
         {...attributes}
         {...listeners}
@@ -71,11 +77,8 @@ function SortableRankedItem({
       >
         {position}
       </div>
-
-      {/* Restaurant info */}
       <div className="min-w-0 flex-1">
         <p className="truncate font-semibold text-amber-900">{item.name}</p>
-        {/* Biscuit type dropdown */}
         {item.biscuitTypes.length > 0 && (
           <select
             value={item.selectedBiscuitTypeId ?? ""}
@@ -95,14 +98,113 @@ function SortableRankedItem({
           </select>
         )}
       </div>
-
-      {/* Remove button */}
       <button
         onClick={onRemove}
         className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full text-amber-400 hover:bg-red-50 hover:text-red-500"
       >
         ✕
       </button>
+    </div>
+  );
+}
+
+// ---------- Empty slot (droppable only) ----------
+function EmptySlot({
+  slotIndex,
+  position,
+  isDraggingFromAvailable,
+  isFirstEmpty,
+}: {
+  slotIndex: number;
+  position: number;
+  isDraggingFromAvailable: boolean;
+  isFirstEmpty: boolean;
+}) {
+  const { setNodeRef, isOver } = useDroppable({
+    id: `${SLOT_PREFIX}${slotIndex}`,
+  });
+
+  const highlight = isDraggingFromAvailable && (isOver || isFirstEmpty);
+
+  return (
+    <div
+      ref={setNodeRef}
+      className={`flex items-center gap-3 rounded-lg border-2 border-dashed p-3 transition-colors ${
+        highlight
+          ? "border-amber-500 bg-amber-100"
+          : "border-amber-200 bg-transparent"
+      }`}
+    >
+      <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-amber-100 text-sm font-bold text-amber-400">
+        {position}
+      </div>
+      <p className="text-sm text-amber-400">
+        {highlight ? "Drop here" : "Empty slot"}
+      </p>
+    </div>
+  );
+}
+
+// ---------- Available item (draggable only) ----------
+function DraggableAvailableItem({
+  id,
+  name,
+  imageUrl,
+  biscuits,
+  onClick,
+  disabled,
+}: {
+  id: string;
+  name: string;
+  imageUrl: string | null;
+  biscuits: { biscuitType: { id: string; name: string } }[];
+  onClick: () => void;
+  disabled: boolean;
+}) {
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
+    id: `${AVAIL_PREFIX}${id}`,
+    disabled,
+  });
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={{ opacity: isDragging ? 0.4 : 1 }}
+      {...attributes}
+      {...listeners}
+      onClick={disabled ? undefined : onClick}
+      className={`flex w-full items-start gap-3 rounded-lg border border-amber-200 bg-white p-3 text-left transition-all hover:border-amber-400 hover:shadow-sm ${
+        disabled
+          ? "cursor-not-allowed opacity-50"
+          : "cursor-grab active:cursor-grabbing"
+      }`}
+    >
+      {imageUrl && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={imageUrl}
+          alt={name}
+          className="h-10 w-10 flex-shrink-0 rounded border border-amber-200 object-contain bg-white"
+          onError={(e) => {
+            (e.target as HTMLImageElement).style.display = "none";
+          }}
+        />
+      )}
+      <div className="min-w-0 flex-1">
+        <p className="font-medium text-amber-900">{name}</p>
+        {biscuits.length > 0 && (
+          <div className="mt-1 flex flex-wrap gap-1">
+            {biscuits.map((b) => (
+              <span
+                key={b.biscuitType.id}
+                className="rounded-full bg-amber-50 px-2 py-0.5 text-xs text-amber-600"
+              >
+                {b.biscuitType.name}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -137,6 +239,7 @@ export default function RankPage() {
           id: entry.restaurant.id,
           name: entry.restaurant.name,
           slug: entry.restaurant.slug,
+          imageUrl: restaurant?.imageUrl ?? null,
           selectedBiscuitTypeId: entry.biscuitType?.id ?? null,
           biscuitTypes:
             restaurant?.biscuits.map((b) => ({
@@ -149,7 +252,6 @@ export default function RankPage() {
     }
   }, [myBallot.data, restaurants.data]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Filter out already-ranked restaurants
   const available =
     restaurants.data?.filter((r) => !ranked.some((item) => item.id === r.id)) ??
     [];
@@ -160,25 +262,39 @@ export default function RankPage() {
       )
     : available;
 
-  const addToRanking = (restaurantId: string) => {
-    if (ranked.length >= 5) return;
+  const buildRankedRestaurant = (restaurantId: string): RankedRestaurant | null => {
     const restaurant = restaurants.data?.find((r) => r.id === restaurantId);
-    if (!restaurant) return;
-    if (ranked.some((r) => r.id === restaurantId)) return;
+    if (!restaurant) return null;
+    return {
+      id: restaurant.id,
+      name: restaurant.name,
+      slug: restaurant.slug,
+      imageUrl: restaurant.imageUrl ?? null,
+      selectedBiscuitTypeId: null,
+      biscuitTypes: restaurant.biscuits.map((b) => ({
+        id: b.biscuitType.id,
+        name: b.biscuitType.name,
+      })),
+    };
+  };
 
-    setRanked((prev) => [
-      ...prev,
-      {
-        id: restaurant.id,
-        name: restaurant.name,
-        slug: restaurant.slug,
-        selectedBiscuitTypeId: null,
-        biscuitTypes: restaurant.biscuits.map((b) => ({
-          id: b.biscuitType.id,
-          name: b.biscuitType.name,
-        })),
-      },
-    ]);
+  const appendToRanking = (restaurantId: string) => {
+    if (ranked.length >= 5) return;
+    if (ranked.some((r) => r.id === restaurantId)) return;
+    const newItem = buildRankedRestaurant(restaurantId);
+    if (!newItem) return;
+    setRanked((prev) => [...prev, newItem]);
+  };
+
+  const insertAtPosition = (restaurantId: string, index: number) => {
+    if (ranked.some((r) => r.id === restaurantId)) return;
+    const newItem = buildRankedRestaurant(restaurantId);
+    if (!newItem) return;
+    setRanked((prev) => {
+      const next = [...prev];
+      next.splice(index, 0, newItem);
+      return next.slice(0, 5); // cap at 5; bumps #5 if full
+    });
   };
 
   const removeFromRanking = (restaurantId: string) => {
@@ -208,24 +324,40 @@ export default function RankPage() {
 
     if (!over) return;
 
-    const draggedId = active.id as string;
-    const overId = over.id as string;
+    const activeRaw = active.id as string;
+    const overRaw = over.id as string;
+    const isFromAvailable = activeRaw.startsWith(AVAIL_PREFIX);
 
-    // Check if dragging from available list to ranking
-    const isFromAvailable = !ranked.some((r) => r.id === draggedId);
-    const isOverRanking =
-      ranked.some((r) => r.id === overId) || overId === "ranking-droppable";
+    // Case 1: dragging an available restaurant
+    if (isFromAvailable) {
+      const restaurantId = activeRaw.slice(AVAIL_PREFIX.length);
 
-    if (isFromAvailable && (isOverRanking || ranked.length < 5)) {
-      addToRanking(draggedId);
+      // Dropped on a specific empty slot -> insert at that position
+      if (overRaw.startsWith(SLOT_PREFIX)) {
+        const slotIndex = parseInt(overRaw.slice(SLOT_PREFIX.length), 10);
+        // Slot indexes start at ranked.length (first empty). Clamp.
+        const target = Math.min(slotIndex, ranked.length);
+        insertAtPosition(restaurantId, target);
+        return;
+      }
+
+      // Dropped on an existing ranked item -> insert at that item's index
+      const existingIdx = ranked.findIndex((r) => r.id === overRaw);
+      if (existingIdx !== -1) {
+        insertAtPosition(restaurantId, existingIdx);
+        return;
+      }
+
+      // Fallback -> append to end
+      appendToRanking(restaurantId);
       return;
     }
 
-    // Reordering within ranking
-    if (!isFromAvailable && ranked.some((r) => r.id === overId)) {
-      const oldIndex = ranked.findIndex((r) => r.id === draggedId);
-      const newIndex = ranked.findIndex((r) => r.id === overId);
-      if (oldIndex !== newIndex) {
+    // Case 2: reordering within the ranked list
+    if (ranked.some((r) => r.id === overRaw)) {
+      const oldIndex = ranked.findIndex((r) => r.id === activeRaw);
+      const newIndex = ranked.findIndex((r) => r.id === overRaw);
+      if (oldIndex !== -1 && newIndex !== -1 && oldIndex !== newIndex) {
         setRanked((prev) => arrayMove(prev, oldIndex, newIndex));
       }
     }
@@ -271,8 +403,12 @@ export default function RankPage() {
     );
   }
 
-  const activeRestaurant = activeId
-    ? restaurants.data?.find((r) => r.id === activeId)
+  const isDraggingFromAvailable = !!activeId && activeId.startsWith(AVAIL_PREFIX);
+  const activeRestaurantId = isDraggingFromAvailable
+    ? activeId?.slice(AVAIL_PREFIX.length)
+    : activeId;
+  const activeRestaurant = activeRestaurantId
+    ? restaurants.data?.find((r) => r.id === activeRestaurantId)
     : null;
 
   return (
@@ -318,26 +454,21 @@ export default function RankPage() {
                     }
                   />
                 ))}
-                {/* Empty slots */}
-                {Array.from({ length: 5 - ranked.length }).map((_, i) => (
-                  <div
-                    key={`empty-${i}`}
-                    className="flex items-center gap-3 rounded-lg border-2 border-dashed border-amber-200 p-3"
-                  >
-                    <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-amber-100 text-sm font-bold text-amber-400">
-                      {ranked.length + i + 1}
-                    </div>
-                    <p className="text-sm text-amber-400">
-                      {ranked.length === 0 && i === 0
-                        ? "Tap a restaurant or drag it here"
-                        : "Empty slot"}
-                    </p>
-                  </div>
-                ))}
+                {Array.from({ length: 5 - ranked.length }).map((_, i) => {
+                  const slotIndex = ranked.length + i;
+                  return (
+                    <EmptySlot
+                      key={`empty-${slotIndex}`}
+                      slotIndex={slotIndex}
+                      position={slotIndex + 1}
+                      isDraggingFromAvailable={isDraggingFromAvailable}
+                      isFirstEmpty={i === 0}
+                    />
+                  );
+                })}
               </div>
             </SortableContext>
 
-            {/* Submit button */}
             <button
               onClick={handleSubmit}
               disabled={ranked.length === 0 || submitMutation.isPending}
@@ -369,39 +500,15 @@ export default function RankPage() {
             />
             <div className="max-h-[60vh] space-y-2 overflow-y-auto pr-1">
               {filteredAvailable.map((r) => (
-                <button
+                <DraggableAvailableItem
                   key={r.id}
-                  onClick={() => addToRanking(r.id)}
+                  id={r.id}
+                  name={r.name}
+                  imageUrl={r.imageUrl ?? null}
+                  biscuits={r.biscuits}
+                  onClick={() => appendToRanking(r.id)}
                   disabled={ranked.length >= 5}
-                  className="flex w-full items-start gap-3 rounded-lg border border-amber-200 bg-white p-3 text-left transition-all hover:border-amber-400 hover:shadow-sm disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {r.imageUrl && (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={r.imageUrl}
-                      alt={r.name}
-                      className="h-10 w-10 flex-shrink-0 rounded border border-amber-200 object-contain bg-white"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).style.display = "none";
-                      }}
-                    />
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium text-amber-900">{r.name}</p>
-                    {r.biscuits.length > 0 && (
-                      <div className="mt-1 flex flex-wrap gap-1">
-                        {r.biscuits.map((b) => (
-                          <span
-                            key={b.biscuitType.id}
-                            className="rounded-full bg-amber-50 px-2 py-0.5 text-xs text-amber-600"
-                          >
-                            {b.biscuitType.name}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </button>
+                />
               ))}
               {filteredAvailable.length === 0 && (
                 <p className="py-4 text-center text-sm text-amber-500">
@@ -417,7 +524,6 @@ export default function RankPage() {
         </div>
       </div>
 
-      {/* Drag overlay */}
       <DragOverlay>
         {activeRestaurant && (
           <div className="rounded-lg border-2 border-amber-400 bg-white p-3 shadow-lg">
