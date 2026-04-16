@@ -28,15 +28,13 @@ COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/generated ./generated
 COPY --from=builder /app/scripts/entrypoint.sh ./entrypoint.sh
 
-RUN chmod +x entrypoint.sh
+# Copy full node_modules for prisma CLI migrations
+COPY --from=builder /app/node_modules ./node_modules
 
-# Copy prisma CLI from builder (keeps same version as project)
-COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
-COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
+RUN chmod +x entrypoint.sh
 
 USER nextjs
 EXPOSE 3000
