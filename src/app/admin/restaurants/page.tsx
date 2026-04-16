@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { api } from "~/trpc/react";
 
 export default function AdminRestaurantsPage() {
@@ -11,6 +11,7 @@ export default function AdminRestaurantsPage() {
   const [website, setWebsite] = useState("");
   const [notes, setNotes] = useState("");
   const [selectedBiscuitTypes, setSelectedBiscuitTypes] = useState<string[]>([]);
+  const formRef = useRef<HTMLDivElement>(null);
 
   const utils = api.useUtils();
   const restaurants = api.admin.listRestaurants.useQuery();
@@ -49,6 +50,10 @@ export default function AdminRestaurantsPage() {
     setNotes(r.notes ?? "");
     setSelectedBiscuitTypes(r.biscuits.map((b) => b.biscuitTypeId));
     setShowForm(true);
+    // Scroll the form into view so editing is visually obvious
+    setTimeout(() => {
+      formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 0);
   };
 
   const handleSubmit = () => {
@@ -92,7 +97,10 @@ export default function AdminRestaurantsPage() {
 
       {/* Form */}
       {showForm && (
-        <div className="mb-6 rounded-lg border border-amber-200 bg-white p-4">
+        <div
+          ref={formRef}
+          className="mb-6 scroll-mt-4 rounded-lg border border-amber-200 bg-white p-4"
+        >
           <h2 className="mb-3 font-semibold text-amber-900">
             {editingId ? "Edit Restaurant" : "Add Restaurant"}
           </h2>
