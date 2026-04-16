@@ -25,6 +25,12 @@ export default async function HomePage() {
           >
             Rank Your Top 5
           </Link>
+          <p className="mt-3 text-xs text-amber-500">
+            For fun only — anonymous rankings can be gamed.{" "}
+            <Link href="/about" className="underline hover:text-amber-700">
+              How this works
+            </Link>
+          </p>
         </div>
         <LeaderboardClient />
       </div>

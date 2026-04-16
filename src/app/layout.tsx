@@ -49,6 +49,15 @@ export default function RootLayout({
           <main className="mx-auto max-w-4xl px-4 py-8">{children}</main>
           <footer className="border-t border-amber-200 py-6 text-center text-sm text-amber-700">
             <p>Made with 🫓 in Athens, GA</p>
+            <p className="mt-1">
+              <Link href="/about" className="underline hover:text-amber-900">
+                How rankings work
+              </Link>
+              {" · "}
+              <Link href="/suggest" className="underline hover:text-amber-900">
+                Suggest a spot
+              </Link>
+            </p>
           </footer>
         </TRPCReactProvider>
       </body>
