@@ -34,8 +34,9 @@ COPY --from=builder /app/scripts/entrypoint.sh ./entrypoint.sh
 
 RUN chmod +x entrypoint.sh
 
-# Install prisma CLI for migrations
-RUN npm install -g prisma
+# Copy prisma CLI from builder (keeps same version as project)
+COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
+COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 
 USER nextjs
 EXPOSE 3000
