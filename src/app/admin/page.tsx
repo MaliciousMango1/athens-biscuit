@@ -111,7 +111,7 @@ export default function AdminPage() {
       )}
 
       {/* Navigation */}
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-2">
         <Link
           href="/admin/restaurants"
           className="rounded-lg border border-amber-200 bg-white p-6 transition-shadow hover:shadow-md"
@@ -125,6 +125,13 @@ export default function AdminPage() {
         >
           <h2 className="text-lg font-semibold text-amber-900">Biscuit Types</h2>
           <p className="text-sm text-amber-600">Manage biscuit categories</p>
+        </Link>
+        <Link
+          href="/admin/ballots"
+          className="rounded-lg border border-amber-200 bg-white p-6 transition-shadow hover:shadow-md"
+        >
+          <h2 className="text-lg font-semibold text-amber-900">Ballots</h2>
+          <p className="text-sm text-amber-600">View every submitted ranking</p>
         </Link>
         <Link
           href="/admin/suggestions"

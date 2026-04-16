@@ -163,6 +163,22 @@ export const adminRouter = createTRPCRouter({
       });
     }),
 
+  // Ballots list
+  listBallots: adminProcedure.query(async ({ ctx }) => {
+    return ctx.db.ballot.findMany({
+      orderBy: { updatedAt: "desc" },
+      include: {
+        entries: {
+          orderBy: { position: "asc" },
+          include: {
+            restaurant: true,
+            biscuitType: true,
+          },
+        },
+      },
+    });
+  }),
+
   // Stats
   stats: adminProcedure.query(async ({ ctx }) => {
     const [restaurantCount, biscuitTypeCount, ballotCount, suggestionCount] =
