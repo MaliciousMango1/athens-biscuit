@@ -4,6 +4,8 @@ import { env } from "~/env";
 import {
   getBayesianConfidence,
   SETTING_KEY_BAYESIAN_CONFIDENCE,
+  SETTING_KEY_UMAMI_SCRIPT_URL,
+  SETTING_KEY_UMAMI_WEBSITE_ID,
 } from "~/server/scoring";
 import { BAYESIAN_CONFIDENCE } from "~/lib/constants";
 
@@ -192,10 +194,16 @@ export const adminRouter = createTRPCRouter({
 
   // Settings
   getSettings: adminProcedure.query(async ({ ctx }) => {
-    const bayesianConfidence = await getBayesianConfidence(ctx.db);
+    const [bayesianConfidence, umamiScriptUrl, umamiWebsiteId] = await Promise.all([
+      getBayesianConfidence(ctx.db),
+      ctx.db.setting.findUnique({ where: { key: SETTING_KEY_UMAMI_SCRIPT_URL } }),
+      ctx.db.setting.findUnique({ where: { key: SETTING_KEY_UMAMI_WEBSITE_ID } }),
+    ]);
     return {
       bayesianConfidence,
       bayesianConfidenceDefault: BAYESIAN_CONFIDENCE,
+      umamiScriptUrl: umamiScriptUrl?.value ?? "",
+      umamiWebsiteId: umamiWebsiteId?.value ?? "",
     };
   }),
 
@@ -210,6 +218,24 @@ export const adminRouter = createTRPCRouter({
         },
         update: { value: String(input.value) },
       });
+      return { success: true };
+    }),
+
+  updateUmamiSettings: adminProcedure
+    .input(z.object({ scriptUrl: z.string(), websiteId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      await Promise.all([
+        ctx.db.setting.upsert({
+          where: { key: SETTING_KEY_UMAMI_SCRIPT_URL },
+          create: { key: SETTING_KEY_UMAMI_SCRIPT_URL, value: input.scriptUrl },
+          update: { value: input.scriptUrl },
+        }),
+        ctx.db.setting.upsert({
+          where: { key: SETTING_KEY_UMAMI_WEBSITE_ID },
+          create: { key: SETTING_KEY_UMAMI_WEBSITE_ID, value: input.websiteId },
+          update: { value: input.websiteId },
+        }),
+      ]);
       return { success: true };
     }),
 

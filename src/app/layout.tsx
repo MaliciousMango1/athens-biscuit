@@ -3,8 +3,14 @@ import "~/styles/globals.css";
 import { type Metadata } from "next";
 import { Geist } from "next/font/google";
 import Link from "next/link";
+import Script from "next/script";
 
 import { TRPCReactProvider } from "~/trpc/react";
+import { db } from "~/server/db";
+import {
+  SETTING_KEY_UMAMI_SCRIPT_URL,
+  SETTING_KEY_UMAMI_WEBSITE_ID,
+} from "~/server/scoring";
 
 export const metadata: Metadata = {
   title: "Athens Biscuit Rankings",
@@ -17,11 +23,23 @@ const geist = Geist({
   variable: "--font-geist-sans",
 });
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const [umamiScriptUrl, umamiWebsiteId] = await Promise.all([
+    db.setting.findUnique({ where: { key: SETTING_KEY_UMAMI_SCRIPT_URL } }),
+    db.setting.findUnique({ where: { key: SETTING_KEY_UMAMI_WEBSITE_ID } }),
+  ]);
+
   return (
     <html lang="en" className={`${geist.variable}`}>
+      {umamiScriptUrl?.value && umamiWebsiteId?.value && (
+        <Script
+          src={umamiScriptUrl.value}
+          data-website-id={umamiWebsiteId.value}
+          strategy="afterInteractive"
+        />
+      )}
       <body className="min-h-screen bg-amber-50 text-gray-900">
         <TRPCReactProvider>
           <nav className="sticky top-0 z-50 border-b border-amber-200 bg-amber-50/95 backdrop-blur">

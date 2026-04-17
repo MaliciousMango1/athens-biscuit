@@ -2,6 +2,8 @@ import { POSITION_POINTS, BAYESIAN_CONFIDENCE } from "~/lib/constants";
 import type { PrismaClient } from "../../generated/prisma";
 
 export const SETTING_KEY_BAYESIAN_CONFIDENCE = "bayesian_confidence";
+export const SETTING_KEY_UMAMI_SCRIPT_URL = "umami_script_url";
+export const SETTING_KEY_UMAMI_WEBSITE_ID = "umami_website_id";
 
 /**
  * Read the current Bayesian confidence (m) value, falling back to the compile-time

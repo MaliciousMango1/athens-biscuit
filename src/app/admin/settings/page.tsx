@@ -11,18 +11,33 @@ export default function AdminSettingsPage() {
     onSuccess: () => {
       void utils.admin.getSettings.invalidate();
       void utils.leaderboard.ranked.invalidate();
-      setStatus("saved");
-      setTimeout(() => setStatus("idle"), 1500);
+      setBayesianStatus("saved");
+      setTimeout(() => setBayesianStatus("idle"), 1500);
+    },
+  });
+  const updateUmami = api.admin.updateUmamiSettings.useMutation({
+    onSuccess: () => {
+      void utils.admin.getSettings.invalidate();
+      setUmamiStatus("saved");
+      setTimeout(() => setUmamiStatus("idle"), 1500);
     },
   });
 
   const [value, setValue] = useState<string>("");
-  const [status, setStatus] = useState<"idle" | "saved">("idle");
+  const [bayesianStatus, setBayesianStatus] = useState<"idle" | "saved">("idle");
+  const [umamiScriptUrl, setUmamiScriptUrl] = useState<string>("");
+  const [umamiWebsiteId, setUmamiWebsiteId] = useState<string>("");
+  const [umamiStatus, setUmamiStatus] = useState<"idle" | "saved">("idle");
 
-  // Seed the input once data loads
+  // Keep old alias for existing code below
+  const status = bayesianStatus;
+
+  // Seed inputs once data loads
   useEffect(() => {
-    if (settings.data && value === "") {
-      setValue(String(settings.data.bayesianConfidence));
+    if (settings.data) {
+      if (value === "") setValue(String(settings.data.bayesianConfidence));
+      if (umamiScriptUrl === "") setUmamiScriptUrl(settings.data.umamiScriptUrl);
+      if (umamiWebsiteId === "") setUmamiWebsiteId(settings.data.umamiWebsiteId);
     }
   }, [settings.data]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -97,6 +112,61 @@ export default function AdminSettingsPage() {
           · Default: {settings.data?.bayesianConfidenceDefault} · Leaderboard
           recomputes on next page load.
         </p>
+      </div>
+
+      <div className="mt-6 rounded-lg border border-amber-200 bg-white p-6">
+        <h2 className="text-lg font-semibold text-amber-900">
+          Umami Analytics
+        </h2>
+        <p className="mt-1 text-sm text-amber-700">
+          Paste your Umami script URL and website ID to enable analytics. Leave
+          blank to disable.
+        </p>
+
+        <div className="mt-4 space-y-3">
+          <div>
+            <label className="mb-1 block text-xs font-medium text-amber-800">
+              Script URL
+            </label>
+            <input
+              type="url"
+              placeholder="https://analytics.example.com/script.js"
+              value={umamiScriptUrl}
+              onChange={(e) => setUmamiScriptUrl(e.target.value)}
+              className="w-full rounded-md border border-amber-300 px-3 py-2 text-sm text-amber-900 focus:border-amber-500 focus:outline-none"
+            />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-amber-800">
+              Website ID
+            </label>
+            <input
+              type="text"
+              placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+              value={umamiWebsiteId}
+              onChange={(e) => setUmamiWebsiteId(e.target.value)}
+              className="w-full rounded-md border border-amber-300 px-3 py-2 text-sm text-amber-900 focus:border-amber-500 focus:outline-none"
+            />
+          </div>
+        </div>
+
+        <div className="mt-4 flex items-center gap-3">
+          <button
+            onClick={() =>
+              updateUmami.mutate({
+                scriptUrl: umamiScriptUrl,
+                websiteId: umamiWebsiteId,
+              })
+            }
+            disabled={updateUmami.isPending}
+            className="rounded-md bg-amber-600 px-4 py-2 font-semibold text-white hover:bg-amber-700 disabled:opacity-50"
+          >
+            {updateUmami.isPending ? "Saving..." : "Save"}
+          </button>
+          {umamiStatus === "saved" && (
+            <span className="text-sm font-medium text-green-700">✓ Saved</span>
+          )}
+        </div>
       </div>
     </div>
   );
