@@ -91,22 +91,34 @@ export default function AdminPage() {
       {/* Stats */}
       {stats.data && (
         <div className="mb-8 grid grid-cols-2 gap-4 md:grid-cols-4">
-          <div className="rounded-lg border border-amber-200 bg-white p-4">
+          <Link
+            href="/admin/restaurants"
+            className="rounded-lg border border-amber-200 bg-white p-4 transition-shadow hover:shadow-md"
+          >
             <p className="text-2xl font-bold text-amber-900">{stats.data.restaurantCount}</p>
             <p className="text-sm text-amber-600">Restaurants</p>
-          </div>
-          <div className="rounded-lg border border-amber-200 bg-white p-4">
+          </Link>
+          <Link
+            href="/admin/biscuit-types"
+            className="rounded-lg border border-amber-200 bg-white p-4 transition-shadow hover:shadow-md"
+          >
             <p className="text-2xl font-bold text-amber-900">{stats.data.biscuitTypeCount}</p>
             <p className="text-sm text-amber-600">Biscuit Types</p>
-          </div>
-          <div className="rounded-lg border border-amber-200 bg-white p-4">
+          </Link>
+          <Link
+            href="/admin/ballots"
+            className="rounded-lg border border-amber-200 bg-white p-4 transition-shadow hover:shadow-md"
+          >
             <p className="text-2xl font-bold text-amber-900">{stats.data.ballotCount}</p>
             <p className="text-sm text-amber-600">Total Ballots</p>
-          </div>
-          <div className="rounded-lg border border-amber-200 bg-white p-4">
+          </Link>
+          <Link
+            href="/admin/suggestions"
+            className="rounded-lg border border-amber-200 bg-white p-4 transition-shadow hover:shadow-md"
+          >
             <p className="text-2xl font-bold text-amber-900">{stats.data.suggestionCount}</p>
             <p className="text-sm text-amber-600">Pending Suggestions</p>
-          </div>
+          </Link>
         </div>
       )}
 
