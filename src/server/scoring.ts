@@ -133,8 +133,8 @@ export async function getLeaderboard(
     },
   );
 
-  // Sort by Bayesian score descending
+  // Sort by Bayesian score descending, exclude single-vote restaurants
   leaderboard.sort((a, b) => b.bayesianScore - a.bayesianScore);
 
-  return leaderboard;
+  return leaderboard.filter((e) => e.voteCount >= 2);
 }
