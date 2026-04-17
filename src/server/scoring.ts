@@ -1,6 +1,21 @@
 import { POSITION_POINTS, BAYESIAN_CONFIDENCE } from "~/lib/constants";
 import type { PrismaClient } from "../../generated/prisma";
 
+export const SETTING_KEY_BAYESIAN_CONFIDENCE = "bayesian_confidence";
+
+/**
+ * Read the current Bayesian confidence (m) value, falling back to the compile-time
+ * default if nothing has been set via the admin panel.
+ */
+export async function getBayesianConfidence(db: PrismaClient): Promise<number> {
+  const row = await db.setting.findUnique({
+    where: { key: SETTING_KEY_BAYESIAN_CONFIDENCE },
+  });
+  if (!row) return BAYESIAN_CONFIDENCE;
+  const parsed = parseFloat(row.value);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : BAYESIAN_CONFIDENCE;
+}
+
 export interface LeaderboardEntry {
   restaurantId: string;
   restaurantName: string;
@@ -83,7 +98,7 @@ export async function getLeaderboard(
       ? allPoints.reduce((a, b) => a + b, 0) / allPoints.length
       : 3; // default if no votes at all
 
-  const m = BAYESIAN_CONFIDENCE;
+  const m = await getBayesianConfidence(db);
 
   // Calculate Bayesian score for each restaurant
   const leaderboard: LeaderboardEntry[] = Array.from(restaurantMap.values()).map(

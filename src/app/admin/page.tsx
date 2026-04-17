@@ -140,6 +140,13 @@ export default function AdminPage() {
           <h2 className="text-lg font-semibold text-amber-900">Suggestions</h2>
           <p className="text-sm text-amber-600">Review community suggestions</p>
         </Link>
+        <Link
+          href="/admin/settings"
+          className="rounded-lg border border-amber-200 bg-white p-6 transition-shadow hover:shadow-md"
+        >
+          <h2 className="text-lg font-semibold text-amber-900">Settings</h2>
+          <p className="text-sm text-amber-600">Tune ranking algorithm</p>
+        </Link>
       </div>
     </div>
   );

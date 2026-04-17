@@ -1,6 +1,11 @@
 import { z } from "zod";
 import { createTRPCRouter, adminProcedure, publicProcedure } from "~/server/api/trpc";
 import { env } from "~/env";
+import {
+  getBayesianConfidence,
+  SETTING_KEY_BAYESIAN_CONFIDENCE,
+} from "~/server/scoring";
+import { BAYESIAN_CONFIDENCE } from "~/lib/constants";
 
 function slugify(text: string): string {
   return text
@@ -184,6 +189,29 @@ export const adminRouter = createTRPCRouter({
       },
     });
   }),
+
+  // Settings
+  getSettings: adminProcedure.query(async ({ ctx }) => {
+    const bayesianConfidence = await getBayesianConfidence(ctx.db);
+    return {
+      bayesianConfidence,
+      bayesianConfidenceDefault: BAYESIAN_CONFIDENCE,
+    };
+  }),
+
+  updateBayesianConfidence: adminProcedure
+    .input(z.object({ value: z.number().positive().max(1000) }))
+    .mutation(async ({ ctx, input }) => {
+      await ctx.db.setting.upsert({
+        where: { key: SETTING_KEY_BAYESIAN_CONFIDENCE },
+        create: {
+          key: SETTING_KEY_BAYESIAN_CONFIDENCE,
+          value: String(input.value),
+        },
+        update: { value: String(input.value) },
+      });
+      return { success: true };
+    }),
 
   // Stats
   stats: adminProcedure.query(async ({ ctx }) => {

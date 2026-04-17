@@ -82,3 +82,9 @@ model Suggestion {
     status    String   @default("pending") // pending | approved | rejected
     createdAt DateTime @default(now())
 }
+
+model Setting {
+    key       String   @id
+    value     String
+    updatedAt DateTime @updatedAt
+}
