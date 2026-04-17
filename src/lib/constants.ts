@@ -15,7 +15,7 @@ export const MAX_RANKINGS = 5;
 // Set low (2) during early bootstrapping — bump back to 5 once
 // we're averaging several dozen ballots and the leaderboard
 // doesn't need training wheels.
-export const BAYESIAN_CONFIDENCE = 2;
+export const BAYESIAN_CONFIDENCE = 5;
 
 // Rate limiting
 export const MAX_SUBMISSIONS_PER_HOUR = 10;
