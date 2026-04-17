@@ -17,6 +17,11 @@ export const MAX_RANKINGS = 5;
 // doesn't need training wheels.
 export const BAYESIAN_CONFIDENCE = 5;
 
+// Popularity weight. Adds log10(votes + 1) * weight to each
+// restaurant's Bayesian score. Higher weight rewards being on
+// many people's top 5 regardless of position. 0 = disabled.
+export const POPULARITY_WEIGHT = 0.5;
+
 // Rate limiting
 export const MAX_SUBMISSIONS_PER_HOUR = 10;
 

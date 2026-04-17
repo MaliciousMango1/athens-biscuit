@@ -3,11 +3,13 @@ import { createTRPCRouter, adminProcedure, publicProcedure } from "~/server/api/
 import { env } from "~/env";
 import {
   getBayesianConfidence,
+  getPopularityWeight,
   SETTING_KEY_BAYESIAN_CONFIDENCE,
+  SETTING_KEY_POPULARITY_WEIGHT,
   SETTING_KEY_UMAMI_SCRIPT_URL,
   SETTING_KEY_UMAMI_WEBSITE_ID,
 } from "~/server/scoring";
-import { BAYESIAN_CONFIDENCE } from "~/lib/constants";
+import { BAYESIAN_CONFIDENCE, POPULARITY_WEIGHT } from "~/lib/constants";
 
 function slugify(text: string): string {
   return text
@@ -194,14 +196,22 @@ export const adminRouter = createTRPCRouter({
 
   // Settings
   getSettings: adminProcedure.query(async ({ ctx }) => {
-    const [bayesianConfidence, umamiScriptUrl, umamiWebsiteId] = await Promise.all([
-      getBayesianConfidence(ctx.db),
-      ctx.db.setting.findUnique({ where: { key: SETTING_KEY_UMAMI_SCRIPT_URL } }),
-      ctx.db.setting.findUnique({ where: { key: SETTING_KEY_UMAMI_WEBSITE_ID } }),
-    ]);
+    const [bayesianConfidence, popularityWeight, umamiScriptUrl, umamiWebsiteId] =
+      await Promise.all([
+        getBayesianConfidence(ctx.db),
+        getPopularityWeight(ctx.db),
+        ctx.db.setting.findUnique({
+          where: { key: SETTING_KEY_UMAMI_SCRIPT_URL },
+        }),
+        ctx.db.setting.findUnique({
+          where: { key: SETTING_KEY_UMAMI_WEBSITE_ID },
+        }),
+      ]);
     return {
       bayesianConfidence,
       bayesianConfidenceDefault: BAYESIAN_CONFIDENCE,
+      popularityWeight,
+      popularityWeightDefault: POPULARITY_WEIGHT,
       umamiScriptUrl: umamiScriptUrl?.value ?? "",
       umamiWebsiteId: umamiWebsiteId?.value ?? "",
     };
@@ -214,6 +224,20 @@ export const adminRouter = createTRPCRouter({
         where: { key: SETTING_KEY_BAYESIAN_CONFIDENCE },
         create: {
           key: SETTING_KEY_BAYESIAN_CONFIDENCE,
+          value: String(input.value),
+        },
+        update: { value: String(input.value) },
+      });
+      return { success: true };
+    }),
+
+  updatePopularityWeight: adminProcedure
+    .input(z.object({ value: z.number().min(0).max(10) }))
+    .mutation(async ({ ctx, input }) => {
+      await ctx.db.setting.upsert({
+        where: { key: SETTING_KEY_POPULARITY_WEIGHT },
+        create: {
+          key: SETTING_KEY_POPULARITY_WEIGHT,
           value: String(input.value),
         },
         update: { value: String(input.value) },

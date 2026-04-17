@@ -1,7 +1,12 @@
-import { POSITION_POINTS, BAYESIAN_CONFIDENCE } from "~/lib/constants";
+import {
+  POSITION_POINTS,
+  BAYESIAN_CONFIDENCE,
+  POPULARITY_WEIGHT,
+} from "~/lib/constants";
 import type { PrismaClient } from "../../generated/prisma";
 
 export const SETTING_KEY_BAYESIAN_CONFIDENCE = "bayesian_confidence";
+export const SETTING_KEY_POPULARITY_WEIGHT = "popularity_weight";
 export const SETTING_KEY_UMAMI_SCRIPT_URL = "umami_script_url";
 export const SETTING_KEY_UMAMI_WEBSITE_ID = "umami_website_id";
 
@@ -16,6 +21,19 @@ export async function getBayesianConfidence(db: PrismaClient): Promise<number> {
   if (!row) return BAYESIAN_CONFIDENCE;
   const parsed = parseFloat(row.value);
   return Number.isFinite(parsed) && parsed > 0 ? parsed : BAYESIAN_CONFIDENCE;
+}
+
+/**
+ * Read the popularity weight, which scales a log-of-votes bonus added
+ * to each restaurant's score. Set to 0 to disable.
+ */
+export async function getPopularityWeight(db: PrismaClient): Promise<number> {
+  const row = await db.setting.findUnique({
+    where: { key: SETTING_KEY_POPULARITY_WEIGHT },
+  });
+  if (!row) return POPULARITY_WEIGHT;
+  const parsed = parseFloat(row.value);
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : POPULARITY_WEIGHT;
 }
 
 export interface LeaderboardEntry {
@@ -101,13 +119,16 @@ export async function getLeaderboard(
       : 3; // default if no votes at all
 
   const m = await getBayesianConfidence(db);
+  const popularityWeight = await getPopularityWeight(db);
 
   // Calculate Bayesian score for each restaurant
   const leaderboard: LeaderboardEntry[] = Array.from(restaurantMap.values()).map(
     ({ restaurant, points, biscuitTypeCounts }) => {
       const v = points.length;
       const R = points.reduce((a, b) => a + b, 0) / v;
-      const bayesianScore = (v / (v + m)) * R + (m / (v + m)) * globalAvg;
+      const bayesian = (v / (v + m)) * R + (m / (v + m)) * globalAvg;
+      const popularityBonus = popularityWeight * Math.log10(v + 1);
+      const bayesianScore = bayesian + popularityBonus;
 
       // Find most popular biscuit type
       let topBiscuitType: string | null = null;
