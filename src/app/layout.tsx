@@ -26,10 +26,16 @@ const geist = Geist({
 export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const [umamiScriptUrl, umamiWebsiteId] = await Promise.all([
-    db.setting.findUnique({ where: { key: SETTING_KEY_UMAMI_SCRIPT_URL } }),
-    db.setting.findUnique({ where: { key: SETTING_KEY_UMAMI_WEBSITE_ID } }),
-  ]);
+  let umamiScriptUrl: { value: string } | null = null;
+  let umamiWebsiteId: { value: string } | null = null;
+  try {
+    [umamiScriptUrl, umamiWebsiteId] = await Promise.all([
+      db.setting.findUnique({ where: { key: SETTING_KEY_UMAMI_SCRIPT_URL } }),
+      db.setting.findUnique({ where: { key: SETTING_KEY_UMAMI_WEBSITE_ID } }),
+    ]);
+  } catch {
+    // DB not available at build time — skip analytics injection
+  }
 
   return (
     <html lang="en" className={`${geist.variable}`}>
