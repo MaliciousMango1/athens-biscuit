@@ -9,6 +9,10 @@ function slugify(text: string): string {
     .replace(/(^-|-$)/g, "");
 }
 
+function avatarUrl(name: string): string {
+  return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=d97706&color=fff&size=256&bold=true&font-size=0.4`;
+}
+
 export const adminRouter = createTRPCRouter({
   // Login check - public so the login form can call it
   login: publicProcedure
@@ -49,6 +53,7 @@ export const adminRouter = createTRPCRouter({
           slug,
           address: input.address ?? null,
           website: input.website || null,
+          imageUrl: avatarUrl(input.name),
           notes: input.notes ?? null,
           biscuits: input.biscuitTypeIds
             ? {
@@ -77,10 +82,11 @@ export const adminRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const { id, biscuitTypeIds, ...data } = input;
 
-      // Update slug if name changed
+      // Update slug and avatar if name changed
       const updateData: Record<string, unknown> = { ...data };
       if (data.name) {
         updateData.slug = slugify(data.name);
+        updateData.imageUrl = avatarUrl(data.name);
       }
 
       const restaurant = await ctx.db.restaurant.update({
