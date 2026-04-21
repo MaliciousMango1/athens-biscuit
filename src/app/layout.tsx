@@ -12,6 +12,17 @@ import {
   SETTING_KEY_UMAMI_WEBSITE_ID,
 } from "~/server/scoring";
 
+function BiscuitIcon({ className }: { className?: string }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" className={className} aria-hidden="true">
+      <ellipse cx="50" cy="58" rx="44" ry="22" fill="#b45309"/>
+      <ellipse cx="50" cy="48" rx="44" ry="22" fill="#d97706"/>
+      <ellipse cx="50" cy="42" rx="36" ry="12" fill="#fbbf24" opacity="0.55"/>
+      <path d="M6 52 Q50 60 94 52" stroke="#92400e" strokeWidth="2" fill="none" opacity="0.6"/>
+    </svg>
+  );
+}
+
 export const metadata: Metadata = {
   title: "Athens Biscuit Rankings",
   description:
@@ -51,7 +62,7 @@ export default async function RootLayout({
           <nav className="sticky top-0 z-50 border-b border-amber-200 bg-amber-50/95 backdrop-blur">
             <div className="mx-auto flex max-w-4xl items-center justify-between px-4 py-3">
               <Link href="/" className="flex items-center gap-2 text-lg font-bold text-amber-900">
-                <span className="text-2xl">🫓</span>
+                <BiscuitIcon className="h-7 w-7" />
                 <span>Athens Biscuit</span>
               </Link>
               <div className="flex items-center gap-4">
@@ -72,7 +83,7 @@ export default async function RootLayout({
           </nav>
           <main className="mx-auto max-w-4xl px-4 py-8">{children}</main>
           <footer className="border-t border-amber-200 py-6 text-center text-sm text-amber-700">
-            <p>Made with 🫓 in Athens, GA</p>
+            <p className="flex items-center justify-center gap-1.5">Made with <BiscuitIcon className="inline-block h-4 w-4" /> in Athens, GA</p>
           </footer>
         </TRPCReactProvider>
       </body>
